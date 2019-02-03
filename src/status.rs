@@ -1,6 +1,6 @@
 extern crate backtrace;
 use self::backtrace::Backtrace;
-use libc::c_uint;
+use libc::c_int;
 use primitiv_sys as _primitiv;
 use std::env;
 use std::ffi::CString;
@@ -16,23 +16,23 @@ use std::result;
 pub(crate) enum Code {
     Ok,
     Error,
-    UnrecognizedEnumValue(c_uint),
+    UnrecognizedEnumValue(c_int),
 }
 
 impl Code {
-    pub fn from_int(value: c_uint) -> Self {
+    pub fn from_int(value: c_int) -> Self {
         match value {
             0 => Code::Ok,
-            4294967295 => Code::Error,
+            -1 => Code::Error,
             c => Code::UnrecognizedEnumValue(c),
         }
     }
 
-    pub fn to_int(&self) -> c_uint {
+    pub fn to_int(&self) -> c_int {
         match self {
             &Code::UnrecognizedEnumValue(c) => c,
             &Code::Ok => 0,
-            &Code::Error => 4294967295,
+            &Code::Error => -1,
         }
     }
 
@@ -43,10 +43,10 @@ impl Code {
 
     #[allow(dead_code)]
     fn from_c(value: _primitiv::PRIMITIV_C_STATUS) -> Self {
-        Self::from_int(value as c_uint)
+        Self::from_int(value as c_int)
     }
 
-    pub fn is_ok(value: c_uint) -> bool {
+    pub fn is_ok(value: c_int) -> bool {
         match value {
             0 => true,
             _ => false,
@@ -120,11 +120,11 @@ impl Debug for Status {
 }
 
 pub(crate) trait ApiResult<T, E> {
-    fn from_api_status(status: c_uint, ok_val: T) -> result::Result<T, E>;
+    fn from_api_status(status: c_int, ok_val: T) -> result::Result<T, E>;
 }
 
 impl<T> ApiResult<T, Status> for result::Result<T, Status> {
-    fn from_api_status(status: c_uint, ok_val: T) -> Self {
+    fn from_api_status(status: c_int, ok_val: T) -> Self {
         let code = Code::from_int(status);
         match code {
             Code::Ok => Ok(ok_val),
