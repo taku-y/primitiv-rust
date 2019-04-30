@@ -323,6 +323,14 @@ pub fn matmul<T1: AsRef<Tensor>, T2: AsRef<Tensor>>(a: T1, b: T2) -> Tensor {
     )
 }
 
+pub fn ltrs<T1: AsRef<Tensor>, T2: AsRef<Tensor>>(a: T1, b: T2) -> Tensor {
+    tensor_func_body!(
+        primitivApplyTensorLtrs,
+        a.as_ref().as_ptr(),
+        b.as_ref().as_ptr()
+    )
+}
+
 impl_tensor_unary_func!(abs, primitivApplyTensorAbs);
 impl_tensor_unary_func!(sqrt, primitivApplyTensorSqrt);
 impl_tensor_unary_func!(exp, primitivApplyTensorExp);

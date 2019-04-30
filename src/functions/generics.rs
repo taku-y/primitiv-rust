@@ -16,7 +16,7 @@ pub mod exports {
     pub use super::{
         abs, add, add_const, add_var, batch, broadcast, concat, constant, constant_on, conv2d,
         copy, copy_on, cos, divide, divide_const, divide_var, dropout, elu, exp, flatten, identity,
-        identity_on, input, input_on, log, log_softmax, logsumexp, lrelu, matmul, max, max_pool2d,
+        identity_on, input, input_on, log, log_softmax, logsumexp, lrelu, ltrs, matmul, max, max_pool2d,
         mean, mean_vars, min, multiply, multiply_const, multiply_var, negative, ones, ones_on,
         parameter, pick, positive, pow, pow_const, pow_var, pown, prelu, random, relu, reshape,
         selu, sigmoid, sin, slice, softmax, softmax_cross_entropy, softmax_cross_entropy_with_ids,
@@ -291,6 +291,10 @@ pub fn transpose<T: AsRef<V>, V: Variable>(x: T) -> V {
 
 pub fn matmul<T1: AsRef<V>, T2: AsRef<V>, V: Variable>(a: T1, b: T2) -> V {
     <V as Variable>::F::matmul(a, b)
+}
+
+pub fn ltrs<T1: AsRef<V>, T2: AsRef<V>, V: Variable>(a: T1, b: T2) -> V {
+    <V as Variable>::F::ltrs(a, b)
 }
 
 pub fn abs<T: AsRef<V>, V: Variable>(x: T) -> V {
@@ -608,6 +612,7 @@ pub trait Functions<Var> {
     fn flatten<T: AsRef<Var>>(x: T) -> Var;
     fn transpose<T: AsRef<Var>>(x: T) -> Var;
     fn matmul<T1: AsRef<Var>, T2: AsRef<Var>>(a: T1, b: T2) -> Var;
+    fn ltrs<T1: AsRef<Var>, T2: AsRef<Var>>(a: T1, b: T2) -> Var;
     fn abs<T: AsRef<Var>>(x: T) -> Var;
     fn sqrt<T: AsRef<Var>>(x: T) -> Var;
     fn exp<T: AsRef<Var>>(x: T) -> Var;
@@ -863,6 +868,11 @@ impl Functions<Node> for FuncImpls<Node> {
     #[inline]
     fn matmul<T1: AsRef<Node>, T2: AsRef<Node>>(a: T1, b: T2) -> Node {
         node_funcs::matmul(a, b)
+    }
+
+    #[inline]
+    fn ltrs<T1: AsRef<Node>, T2: AsRef<Node>>(a: T1, b: T2) -> Node {
+        node_funcs::ltrs(a, b)
     }
 
     #[inline]
@@ -1343,6 +1353,11 @@ impl Functions<Tensor> for FuncImpls<Tensor> {
     #[inline]
     fn matmul<T1: AsRef<Tensor>, T2: AsRef<Tensor>>(a: T1, b: T2) -> Tensor {
         tensor_funcs::matmul(a, b)
+    }
+
+    #[inline]
+    fn ltrs<T1: AsRef<Tensor>, T2: AsRef<Tensor>>(a: T1, b: T2) -> Tensor {
+        tensor_funcs::ltrs(a, b)
     }
 
     #[inline]
